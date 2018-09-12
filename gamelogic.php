@@ -1,25 +1,11 @@
 <?php
 /*
- * Team 1 Dev Retreat Texting challenge Aug 2018
- * Docs URL https://www.twilio.com/docs/sms/send-messages
- *
- * Rules Create any app using Twilio's SMS or MMS messaging. The app must talk back to the person sending the text.
- *
- * The phone number that has been assigned to your team is +12248013075
- *
- * A database for you to use called team1 has been setup on the dev server.
- *
- * Folders have been created on the develop branch in wapi. Use wapi/team1.
- *
- * Local testing can be done using Postman.
- *
- * The contest will be judged by Brock and 2 other Calldrip employee's. The wining team will get a prize.
- *
- * Good luck!!!
- *
+ Phone Number is 12248013075
  */
 
-require("/opt/lampp/htdocs/assets/php/mysql.php");
+require_once($_SERVER['DOCUMENT_ROOT']. '/ip.php');
+
+$con = mysqli_connect($mysqlip, $mysqluser, $mysqlpass);
 
 try {
     require_once '/opt/lampp/htdocs/vendor/autoload.php'; // Loads the library
@@ -30,87 +16,12 @@ try {
 use Twilio\Rest\Client;
 $client = new Client($twilio_account_sid, $twilio_auth_token);
 
-class kaiju{
-    private $id;
-    private $name;
-    private $health_points;
-    private $rank_id;
-    private $attack_list = array();
-    private $defense_list = array();
 
-    public function __construct($id = null, $name = null, $health_points = null, $rank_id = null, $attack_list = [], $defense_list = []){
-        $this -> id = $id;
-        $this -> name = $name;
-        $this -> health_points = $health_points;
-        $this -> rank_id = $rank_id;
-        $this -> attack_list = $attack_list;
-        $this -> defense_list = $defense_list;
-    }
-
-    public function __set($name, $value){
-        if( property_exists($this, $name)){
-            $this -> $name = $value;
-        }
-    }
-
-    public function set_attack_list($attacks){
-        $this -> attack_list['primary'] = $attacks['primary'];
-        $this -> attack_list['secondary'] = $attacks['secondary'];
-    }
-
-    public function set_defense_list($defenses){
-        $this -> defense_list['primary'] = $defenses['primary'];
-        $this -> defense_list['secondary'] = $defenses['secondary'];
-    }
-
-    public function __get($name){
-        if( property_exists( $this, $name ) ){
-            return $this -> $name;
-        }
-    }
-
-    public function attack($name){
-        foreach($this -> attack_list as $attack){
-            if($attack == $name){
-                $attack_stats = $this->get_move_stats( $attack );
-                return $this->roll($attack_stats[0]['min_effect'], $attack_stats[0]['max_effect']);
-            }
-        }
-    }
-
-    public function defend($name){
-        foreach($this -> defense_list as $defense) {
-            if ($defense == $name) {
-                $defense_stats = $this->get_move_stats($defense);
-
-                return $this->roll($defense_stats[0]['min_effect'], $defense_stats[0]['max_effect']);
-            }
-        }
-    }
-
-    private function get_move_stats( $attack_name ){
-        $sql = "
-            SELECT ML.min_effect, ML.max_effect
-            FROM team1.kaiju_move_list ML
-            WHERE ML.kaiju_id = ? AND ML.`name` = ?
-        ";
-
-        $statement = $GLOBALS['con'] -> prepare($sql);
-        $statement -> bind_param('is', $this->id, $attack_name);
-        $statement -> execute();
-        $result = $statement -> get_result();
-        return $info = $result -> fetch_assoc;
-    }
-
-    private function roll($min, $max){
-        return rand($min, $max);
-    }
-}
 
 function checkSignup($to) {
     $sql = "
         SELECT * 
-        FROM team1.player
+        FROM kaiju.player
         WHERE phone_number = ?
     ";
 
@@ -137,7 +48,7 @@ function sendSignupText($to) {
 
 function createNewPlayer($phoneNumber, $name = "") {
     $sql = "
-        INSERT INTO team1.player (`name`, `phone_number`) VALUES (?, ?);
+        INSERT INTO kaiju.player (`name`, `phone_number`) VALUES (?, ?);
     ";
 
     $statement = $GLOBALS['con'] -> prepare($sql);
@@ -147,7 +58,7 @@ function createNewPlayer($phoneNumber, $name = "") {
 
 function updatePlayer($phoneNumber, $name = "") {
     $sql = "
-        UPDATE team1.player SET `name` = ? WHERE phone_number = ?;
+        UPDATE kaiju.player SET `name` = ? WHERE phone_number = ?;
     ";
 
     $statement = $GLOBALS['con'] -> prepare($sql);
@@ -158,7 +69,7 @@ function updatePlayer($phoneNumber, $name = "") {
 function checkName($to) {
     $sql = "
         SELECT * 
-        FROM team1.player
+        FROM kaiju.player
         WHERE phone_number = ?
     ";
 
@@ -205,7 +116,7 @@ function fetchFirstKaiju() {
 
     $sql = "
         SELECT kaiju_id
-        FROM team1.kaiju
+        FROM kaiju.kaiju
         WHERE kaiju_id = ?
     ";
 
@@ -221,7 +132,7 @@ function fetchFirstKaiju() {
 function getKaijuName($kaiju_id) {
     $sql = "
         SELECT `name`
-        FROM team1.kaiju
+        FROM kaiju.kaiju
         WHERE kaiju_id = ?
     ";
 
@@ -238,7 +149,7 @@ function assignPlayerKaiju($to, $kaiju) {
     $player_id = getPlayerID($to);
 
     $sql = "
-        INSERT INTO team1.player_kaiju (`player_id`, `kaiju_id`) VALUES(?, ?)
+        INSERT INTO kaiju.player_kaiju (`player_id`, `kaiju_id`) VALUES(?, ?)
     ";
 
     $statement = $GLOBALS['con'] -> prepare($sql);
@@ -249,8 +160,8 @@ function assignPlayerKaiju($to, $kaiju) {
 function assignBattleArena($to) {
     $sql = "
         SELECT battle_arena_id, p.phone_number, p.name 
-        FROM team1.battle_arena ba
-            LEFT JOIN  team1.player p ON p.player_id = ba.player_one_id
+        FROM kaiju.battle_arena ba
+            LEFT JOIN  kaiju.player p ON p.player_id = ba.player_one_id
         WHERE player_one_id IS NOT NULL 
         AND player_two_id IS NULL
     ";
@@ -266,7 +177,7 @@ function assignBattleArena($to) {
 
     if($result -> num_rows > 0) {
         $sqlTwo = "
-            UPDATE team1.battle_arena SET player_two_id = ?, current_player_id = ? WHERE battle_arena_id = ?
+            UPDATE kaiju.battle_arena SET player_two_id = ?, current_player_id = ? WHERE battle_arena_id = ?
         ";
 
         $statement = $GLOBALS['con'] -> prepare($sqlTwo);
@@ -302,7 +213,7 @@ function assignBattleArena($to) {
         return "Match start";
     } else {
         $sqlTwo = "
-            INSERT INTO team1.battle_arena (player_one_id) VALUES(?)
+            INSERT INTO kaiju.battle_arena (player_one_id) VALUES(?)
         ";
 
         $statement = $GLOBALS['con'] -> prepare($sqlTwo);
@@ -327,7 +238,7 @@ function assignBattleArena($to) {
 function getPlayerName($to) {
     $sql = "
         SELECT `name`
-        FROM team1.player
+        FROM kaiju.player
         WHERE phone_number = ?
     ";
 
@@ -343,7 +254,7 @@ function getPlayerName($to) {
 function getPlayerID($to) {
     $sql = "
         SELECT player_id
-        FROM team1.player
+        FROM kaiju.player
         WHERE phone_number = ?
     ";
 
@@ -382,11 +293,11 @@ function sendPlayerOptions($to) {
           mt.name as MoveType,
           kml.min_effect as MinEffect,
           kml.max_effect as MaxEffect 
-        FROM team1.kaiju k
-          INNER JOIN team1.player_kaiju pk ON pk.kaiju_id = k.kaiju_id
-          INNER JOIN team1.player p ON p.player_id = pk.player_id
-          INNER JOIN team1.kaiju_move_list kml ON kml.kaiju_id = k.kaiju_id
-          INNER JOIN team1.move_type mt ON mt.move_type_id = kml.move_type_id
+        FROM kaiju.kaiju k
+          INNER JOIN kaiju.player_kaiju pk ON pk.kaiju_id = k.kaiju_id
+          INNER JOIN kaiju.player p ON p.player_id = pk.player_id
+          INNER JOIN kaiju.kaiju_move_list kml ON kml.kaiju_id = k.kaiju_id
+          INNER JOIN kaiju.move_type mt ON mt.move_type_id = kml.move_type_id
         WHERE p.player_id = ?
     ";
 
@@ -417,7 +328,7 @@ function checkIfInGame($to) {
 
     $sql = "
         SELECT *
-        FROM team1.battle_arena 
+        FROM kaiju.battle_arena 
         WHERE (player_one_id = ? OR player_two_id = ?)
         AND winning_player_id IS NULL
     ";
@@ -451,9 +362,9 @@ if(checkSignup($_POST['From'])) {
 
             $sql = "
                 SELECT k.*
-                FROM team1.kaiju k
-                  INNER JOIN team1.player_kaiju pk ON pk.kaiju_id = k.kaiju_id
-                  INNER JOIN team1.player p ON p.player_id = pk.player_id 
+                FROM kaiju.kaiju k
+                  INNER JOIN kaiju.player_kaiju pk ON pk.kaiju_id = k.kaiju_id
+                  INNER JOIN kaiju.player p ON p.player_id = pk.player_id 
                 WHERE p.player_id = ?
             ";
 
@@ -465,10 +376,10 @@ if(checkSignup($_POST['From'])) {
 
             $sqlTwo = "
                 SELECT kml.*
-                FROM team1.kaiju k
-                  INNER JOIN team1.player_kaiju pk ON pk.kaiju_id = k.kaiju_id
-                  INNER JOIN team1.player p ON p.player_id = pk.player_id 
-                  INNER JOIN team1.kaiju_move_list kml ON kml.kaiju_id = k.kaiju_id
+                FROM kaiju.kaiju k
+                  INNER JOIN kaiju.player_kaiju pk ON pk.kaiju_id = k.kaiju_id
+                  INNER JOIN kaiju.player p ON p.player_id = pk.player_id 
+                  INNER JOIN kaiju.kaiju_move_list kml ON kml.kaiju_id = k.kaiju_id
                 WHERE p.player_id = ?
             ";
 
@@ -502,7 +413,7 @@ if(checkSignup($_POST['From'])) {
 
             $sqlThree = "
                 SELECT *
-                FROM team1.kaiju_move_list kml
+                FROM kaiju.kaiju_move_list kml
                 WHERE `name` = ?
             ";
 
@@ -538,7 +449,7 @@ if(checkSignup($_POST['From'])) {
 
             $sqlFour = "
                 SELECT *
-                FROM team1.battle_arena 
+                FROM kaiju.battle_arena 
                 WHERE player_one_id = ? OR player_two_id = ?
             ";
 
@@ -556,7 +467,7 @@ if(checkSignup($_POST['From'])) {
 
             $sqlFive = "
                 SELECT phone_number
-                FROM team1.player
+                FROM kaiju.player
                 WHERE player_id = ?
             ";
 
