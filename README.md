@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://richardtaylordawson.github.io/kaijubattlearena/">
-    <img src="http://icons-for-free.com/free-icons/png/512/1891020.png" alt="Bird icon" width=72 height=72>
+    <img src="http://icons-for-free.com/free-icons/png/512/1891020.png" alt="Message icon" width=72 height=72>
   </a>
 
   <h3 align="center">Kaiju Battle Arena</h3>
