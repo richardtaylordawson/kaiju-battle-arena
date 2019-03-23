@@ -1,0 +1,50 @@
+body {
+  color: white;
+}
+
+.chat-header {
+  border-bottom: 2px solid rgb(65, 65, 65);
+  padding-left: 25px;
+  padding-top: 15px;
+  background-color: rgb(30, 30, 30);
+  border-top-right-radius: 25px;
+  border-top-left-radius: 25px;
+}
+
+.chat-body {
+  height: 60vh;
+  overflow-y: scroll;
+  padding: 0 15px;
+  background-color: rgb(39, 36, 35);
+}
+
+.chat-footer {
+  border-top: 2px solid rgb(65, 65, 65);
+  background-color: rgb(30, 30, 30);
+  padding: 12px 25px;
+  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+
+#user-input {
+  padding: 20px 25px;
+  background-color: #3c3c3c;
+  border: 2px solid rgb(65, 65, 65);
+  border-radius: 25px;
+  color: white;
+  width: 100%;
+}
+
+.message-container {
+  border-radius: 25px;
+  padding: 1px 25px;
+  margin: 8px
+}
+
+.user-message {
+  background-color: rgb(38, 103, 208);
+}
+
+.guest-message {
+  background-color: rgb(85, 85, 85);
+}

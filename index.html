@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="Richard Taylor Dawson">
+
+    <title>Message App</title>
+
+    <link rel="shortcut icon" type="image/ico" href="favicon.ico">
+    <link rel="shortcut icon" sizes="196x196" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
+
+    <!-- Bootstrap Grid -->
+    <link rel="stylesheet" href="assets/third-party/bootstrap-grid-24.css"/>
+
+    <!-- App Styling -->
+    <link rel="stylesheet" href="assets/css/index.css"/>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="conversation-view">
+        <div class="row">
+          <div class="col-xs-offset-1 col-xs-22">
+            <h2>< Back</h2>
+            <div class="chat-container">
+              <div class="row">
+                <div class="col-xs-24 chat-header">
+                  <div class="row">
+                    <div class="col-xs-22">
+                      <p>To: Mike</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-24">
+                  <div class="row">
+                    <div class="col-xs-24 chat-body" id="chat-body">
+                      <div id="chat"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-24 chat-footer">
+                  <div class="row">
+                    <div class="col-xs-24">
+                      <input type="text" placeholder="message..." id="user-input"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Kit -->
+    <script src="https://unpkg.com/@pusher/chatkit-client@1/dist/web/chatkit.js"></script>
+
+
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      // TODO: Replace with your project's customized code snippet
+      var config = {
+        apiKey: "AIzaSyBwEd5wx2xH3CszTviDakg4NGjqYegXGug",
+        authDomain: "test-b725f.firebaseapp.com",
+        databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
+        projectId: "test-b725f",
+        storageBucket: "<BUCKET>.appspot.com",
+        messagingSenderId: "<SENDER_ID>",
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <!-- App Functionality -->
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
